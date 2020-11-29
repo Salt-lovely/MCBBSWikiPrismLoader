@@ -1,0 +1,2 @@
+# MCBBSWikiPrismLoader
+为MCBBSWiki提供代码高亮，高亮使用Prism开源插件
