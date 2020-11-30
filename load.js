@@ -71,6 +71,7 @@
                     ' mw.loader.load(',
                     '$(document).',
                     'console.log(',
+                    'document.write(',
                 ]
             }, {
                 lang: 'go', eig: [
