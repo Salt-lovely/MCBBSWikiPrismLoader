@@ -13,14 +13,14 @@
         var pel = el.parentNode, i
         var thisHref = mw.config.get('wgPageName') || window.location.href.replace('/index.php?', '/').replace('/api.php?', '/').replace('/load.php?', '/')
         var langList = [
-            'css', 'scss', 'sass', 'less',
-            'js', 'javascrip', 'ts', 'typescript',
+            'scss', 'css', 'sass', 'less',
+            'json', 'js', 'javascrip', 'ts', 'typescript',
             'java', 'kotlin',
-            'vb', 'basic', 'vbnet',
+            'vbnet', 'vb', 'basic',
             'batch', 'powershell',
             'python', 'py', 'lua', 'sql',
             'cpp', 'c#',
-            'bbcode', 'markdown', 'json',
+            'bbcode', 'markdown',
             'php', 'asp', 'html',
         ]
         for (i = 0; i < langList.length; i++) {
@@ -31,40 +31,89 @@
         }
         var langEigen = [
             // { lang: '', eig: '' },
-            { lang: 'wiki', eig: /(\n|^)=+\s?[^=]+\s?=+(\n|$)/ }, { lang: 'wiki', eig: /\[\[(分类|category):[^\]]+\]\]/i },
-            { lang: 'wiki', eig: /\{\{(color|font)\|[^\}]+\}\}/i }, { lang: 'wiki', eig: /\{\{\s?#(if|ifeq|switch)\s?:/i },
-
-            { lang: 'cpp', eig: 'cout<<' }, { lang: 'cpp', eig: 'cout <<' }, { lang: 'cpp', eig: '#include <iostream>' },
-            { lang: 'c', eig: /(\n|^)#include/ }, { lang: 'c', eig: /(\n|^)#define/ },
-
-            { lang: 'vbnet', eig: 'Console.WriteLine' },
-            { lang: 'vb', eig: 'As Integer' }, { lang: 'vb', eig: 'As String' }, { lang: 'vb', eig: 'End Function' }, { lang: 'vb', eig: 'End If' },
-
-            { lang: 'java', eig: 'System.out.print' }, { lang: 'java', eig: 'public class' },
-
-            { lang: 'ts', eig: /[0-9a-zA-Z]:\s?(number|string)([\s,\)]|\n)/ },
-
-            { lang: 'js', eig: '$(document)' }, { lang: 'js', eig: 'console.log' },
-            { lang: 'js', eig: /(\n|^)\(function\s?\(\)\s?\{/ }, { lang: 'js', eig: ' mw.loader.load(' },
-
-            { lang: 'go', eig: 'fmt.Println' },
-            { lang: 'kotlin', eig: 'fun main(' },
-            { lang: 'php', eig: '<?php' },
-
-            { lang: 'bbcode', eig: '[/color]' }, { lang: 'bbcode', eig: '[/size]' },
-            { lang: 'bbcode', eig: '[/table]' },
+            {
+                lang: 'wiki', eig: [
+                    /(\n|^)=+\s?[^=]+\s?=+(\n|$)/,      // == 二级标题 ==
+                    /\[\[(分类|category):[^\]]+\]\]/i,  // [[分类: ... ]]
+                    /\{\{(color|font)\|[^\}]+\}\}/i,    // {{color| ... }}
+                    /\{\{\s?#(if|ifeq|switch)\s?:/i,    // {{#if: ... }}
+                    /^\s*\{\{[^\n]+\}\}\s*$/,           // {{ ... }} <-仅一行
+                ]
+            }, {
+                lang: 'cpp', eig: [
+                    /cout\s?<</,                        // cout <<
+                    /(\n|^)#include [<"]iostream[>"]/   // #include <iostream>
+                ]
+            }, {
+                lang: 'c', eig: [
+                    /(\n|^)#include/,                   // #include
+                    /(\n|^)#define/,                    // #define
+                ]
+            }, {
+                lang: 'vbnet', eig: [
+                    'Console.WriteLine'
+                ]
+            }, {
+                lang: 'vb', eig: [
+                    'As Integer',
+                    'As String',
+                    /\n\s*End (Function|Sub|If)(\s|$)/, // End Function
+                ]
+            }, {
+                lang: 'java', eig: [
+                    'System.out.print',
+                    'public class',
+                ]
+            }, {
+                lang: 'ts', eig: [
+                    /[0-9a-zA-Z$]:\s?(number|string|any)([\s,\)]|\n)/
+                ]
+            }, {
+                lang: 'js', eig: [
+                    /(\n|^)\(function\s?\(\s?\)\s?\{/,  // (function (){})
+                    ' mw.loader.load(',
+                    '$(document).',
+                    'console.log(',
+                ]
+            }, {
+                lang: 'go', eig: [
+                    'fmt.Println',
+                ]
+            }, {
+                lang: 'kotlin', eig: [
+                    'fun main('
+                ]
+            }, {
+                lang: 'php', eig: [
+                    '<?php',
+                ]
+            }, {
+                lang: 'bbcode', eig: [
+                    /\[\/(color|size|table)\]/,         // [/table]
+                ]
+            }, {
+                lang: 'html', eig: [
+                    /<\/(html|body|head|title|audio|video)>/i,
+                ]
+            },
         ]
-        for (i = 0; i < langEigen.length; i++) {
-            if (typeof langEigen[i].eig == 'string') {
-                if (el.textContent.indexOf(langEigen[i].eig) != -1) { return langEigen[i].lang }
-            } else if (langEigen[i].eig instanceof RegExp) {
-                if (langEigen[i].eig.test(el.textContent)) { return langEigen[i].lang }
+        for (let l of langEigen) {
+            for (let e of l.eig) {
+                if (typeof e == 'string') {
+                    if (el.textContent.indexOf(e)) {
+                        return l.lang
+                    }
+                } else if (e instanceof RegExp) {
+                    if (e.test(el.textContent)) {
+                        return l.lang
+                    }
+                }
             }
         }
         return 'wiki'
     }
     function loadAssetrs() {
-        mw.loader.load('https://cdn.jsdelivr.net/gh/Salt-lovely/MCBBSWikiPrismLoader/Prism.js');
-        mw.loader.load('https://cdn.jsdelivr.net/gh/Salt-lovely/MCBBSWikiPrismLoader/Prism.css', 'text/css')
+        mw.loader.load('https://cdn.jsdelivr.net/gh/Salt-lovely/MCBBSWikiPrismLoader/prism.js');
+        mw.loader.load('https://cdn.jsdelivr.net/gh/Salt-lovely/MCBBSWikiPrismLoader/prism.css', 'text/css')
     }
 })()
