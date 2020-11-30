@@ -1,7 +1,6 @@
 (function () {
-    var preList = document.querySelectorAll('#mw-content-text pre:not([done])'), el, cs = console
+    var preList = document.querySelectorAll('#mw-content-text pre:not([done])'), el, cs = console, name = 'prism', license = 'CC BY-NC-SA 4.0', st = 'U2FsdCBsb3ZlbHk='
     if (preList.length < 1) { return }
-    cs.log(`[pri` + `sm.` + `js\u8F85\u52A9\u4EE3\u7801]: \u4EE3\u7801\u4F5C\u8005\uFF1ASa` + `lt lov` + `ely\uFF0C\u4EE5CC BY` + `-NC` + `-SA ` + `4.0\u534F\u8BAE\u5206\u53D1\uFF0C\u8F6C\u8F7D\u65F6\u5FC5\u987B\u6CE8\u660E\u4F5C\u8005\u540D\u5B57\u201CSa` + `lt lov` + `ely\u201D\uFF0C\u5FC5\u987B\u6CE8\u660E\u4E0D\u5F97\u5546\u7528\u4E14\u4EE5\u76F8\u540C\u7684\u534F\u8BAE\u5206\u53D1`)
     for (var i = 0; i < preList.length; i++) {
         el = preList[i]
         el.classList.add('line-numbers')
@@ -46,8 +45,7 @@
                 ]
             }, {
                 lang: 'c', eig: [
-                    /(\n|^)#include/,                   // #include
-                    /(\n|^)#define/,                    // #define
+                    /(\n|^)#(include|define)/,          // #include
                 ]
             }, {
                 lang: 'vbnet', eig: [
@@ -55,14 +53,13 @@
                 ]
             }, {
                 lang: 'vb', eig: [
-                    'As Integer',
-                    'As String',
-                    /\n\s*End (Function|Sub|If)(\s|$)/, // End Function
+                    /(Dim|Public|Private) [\S]+ As (Integer|String|Long|Byte)/,
+                    /\n\s*End (Function|Sub|If|Class|Type)(\s|$)/, // End Function
                 ]
             }, {
                 lang: 'java', eig: [
                     'System.out.print',
-                    'public class',
+                    'public static void',
                 ]
             }, {
                 lang: 'ts', eig: [
@@ -100,7 +97,7 @@
         for (let l of langEigen) {
             for (let e of l.eig) {
                 if (typeof e == 'string') {
-                    if (el.textContent.indexOf(e)) {
+                    if (el.textContent.indexOf(e) != -1) {
                         return l.lang
                     }
                 } else if (e instanceof RegExp) {
@@ -113,7 +110,8 @@
         return 'wiki'
     }
     function loadAssetrs() {
-        mw.loader.load('https://cdn.jsdelivr.net/gh/Salt-lovely/MCBBSWikiPrismLoader/prism.js');
-        mw.loader.load('https://cdn.jsdelivr.net/gh/Salt-lovely/MCBBSWikiPrismLoader/prism.css', 'text/css')
+        cs.log(`[${name}.js\u8F85\u52A9\u4EE3\u7801]: \u4EE3\u7801\u4F5C\u8005\uFF1A${atob(st)}\uFF0C\u4EE5${license}\u534F\u8BAE\u5206\u53D1\uFF0C\u8F6C\u8F7D\u65F6\u5FC5\u987B\u6CE8\u660E\u4F5C\u8005\u540D\u5B57\u201CSa` + `lt lov` + `ely\u201D\uFF0C\u5FC5\u987B\u6CE8\u660E\u4E0D\u5F97\u5546\u7528\u4E14\u4EE5\u76F8\u540C\u7684\u534F\u8BAE\u5206\u53D1`)
+        mw.loader.load(`https://cdn.jsdelivr.net/gh/${atob(st).replace(' ', '-')}/MCBBSWikiPrismLoader/${name}.js`);
+        mw.loader.load(`https://cdn.jsdelivr.net/gh/${atob(st).replace(' ', '-')}/MCBBSWikiPrismLoader/${name}.css`, 'text/css')
     }
 })()
