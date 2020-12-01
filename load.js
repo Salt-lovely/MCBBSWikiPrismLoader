@@ -1,17 +1,22 @@
 (function () {
-    var preList = document.querySelectorAll('#mw-content-text pre:not([done])'), el, cs = console, name = 'prism', license = 'CC BY-NC-SA 4.0', st = 'U2FsdCBsb3ZlbHk='
+    let preList = document.querySelectorAll('#mw-content-text pre:not([done])'), el
+    let cs = console, name = 'prism', license = 'CC BY-NC-SA 4.0', st = 'U2FsdCBsb3ZlbHk='
+    let cdn = 'cdn.jsdelivr.net/gh', repo = 'MCBBSWikiPrismLoader'
     if (preList.length < 1) { return }
-    for (var i = 0; i < preList.length; i++) {
+    for (let i = 0; i < preList.length; i++) {
         el = preList[i]
         el.classList.add('line-numbers')
-        el.innerHTML = '<code class="language-' + langGuess(el) + '">' + el.innerHTML + '</code>'
+        if (el.childNodes.length <= 1) {
+            // 有多个节点的一般是含有子元素的
+            el.innerHTML = '<code class="language-' + langGuess(el) + '">' + el.innerHTML + '</code>'
+        }
         el.setAttribute('done', '')
     }
     loadAssetrs()
     function langGuess(el) {
-        var pel = el.parentNode, i
-        var thisHref = mw.config.get('wgPageName') || window.location.href.replace('/index.php?', '/').replace('/api.php?', '/').replace('/load.php?', '/')
-        var langList = [
+        let pel = el.parentNode, i
+        let thisHref = mw.config.get('wgPageName') || window.location.href.replace('/index.php?', '/').replace('/api.php?', '/').replace('/load.php?', '/')
+        let langList = [
             'scss', 'css', 'sass', 'less',
             'json', 'js', 'javascrip', 'ts', 'typescript',
             'java', 'kotlin',
@@ -28,7 +33,7 @@
         for (i = 0; i < langList.length; i++) {
             if (thisHref.indexOf('.' + langList[i]) != -1) { return langList[i] }
         }
-        var langEigen = [
+        let langEigen = [
             // { lang: '', eig: '' },
             {
                 lang: 'wiki', eig: [
@@ -59,7 +64,7 @@
             }, {
                 lang: 'java', eig: [
                     'System.out.print',
-                    'public static void',
+                    'public static void main',
                 ]
             }, {
                 lang: 'ts', eig: [
@@ -67,11 +72,8 @@
                 ]
             }, {
                 lang: 'js', eig: [
-                    /(\n|^)\(function\s?\(\s?\)\s?\{/,  // (function (){})
-                    ' mw.loader.load(',
-                    '$(document).',
-                    'console.log(',
-                    'document.write(',
+                    /(\n|^)[\(\!]function\s?\(\s?\)\s?\{/,  // (function (){})
+                    /(\s|^)(\$\(document\)\.|console\.log\(|document\.write\(|mw\.(loader\.load|config\.[gs]et)\()/,
                 ]
             }, {
                 lang: 'go', eig: [
@@ -108,11 +110,18 @@
                 }
             }
         }
+        // if (el.childNodes.length > 1) {
+        //     return 'none'
+        // } else {
         return 'wiki'
+        // }
     }
+    cs.log(`[${name}.js\u8F85\u52A9\u4EE3\u7801]: \u4EE3\u7801\u4F5C\u8005\uFF1A${dcb64(st)}\uFF0C\u4EE5${license}\u534F\u8BAE\u5206\u53D1\uFF0C\u8F6C\u8F7D\u65F6\u5FC5\u987B\u6CE8\u660E\u4F5C\u8005\u540D\u5B57\u201C${dcb64(st)}\u201D\uFF0C\u5FC5\u987B\u6CE8\u660E\u4E0D\u5F97\u5546\u7528\u4E14\u4EE5\u76F8\u540C\u7684\u534F\u8BAE\u5206\u53D1`)
     function loadAssetrs() {
-        cs.log(`[${name}.js\u8F85\u52A9\u4EE3\u7801]: \u4EE3\u7801\u4F5C\u8005\uFF1A${atob(st)}\uFF0C\u4EE5${license}\u534F\u8BAE\u5206\u53D1\uFF0C\u8F6C\u8F7D\u65F6\u5FC5\u987B\u6CE8\u660E\u4F5C\u8005\u540D\u5B57\u201CSa` + `lt lov` + `ely\u201D\uFF0C\u5FC5\u987B\u6CE8\u660E\u4E0D\u5F97\u5546\u7528\u4E14\u4EE5\u76F8\u540C\u7684\u534F\u8BAE\u5206\u53D1`)
-        mw.loader.load(`https://cdn.jsdelivr.net/gh/${atob(st).replace(' ', '-')}/MCBBSWikiPrismLoader/${name}.js`);
-        mw.loader.load(`https://cdn.jsdelivr.net/gh/${atob(st).replace(' ', '-')}/MCBBSWikiPrismLoader/${name}.css`, 'text/css')
+        mw.loader.load(`https://${cdn}/${dcb64(st).replace(' ', '-')}/${repo}/${name}.js`);
+        mw.loader.load(`https://${cdn}/${dcb64(st).replace(' ', '-')}/${repo}/${name}.css`, 'text/css')
+    }
+    function dcb64(str) {
+        return atob(str)
     }
 })()
