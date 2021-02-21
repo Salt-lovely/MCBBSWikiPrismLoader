@@ -46,6 +46,8 @@ pre > code {
     padding-right: 0;
 }
 
+code[class*=language-]{border: 0px solid transparent;}
+
 @media print {
     code[class*="language-"],
     pre[class*="language-"] {
